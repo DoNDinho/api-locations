@@ -15,7 +15,7 @@ router.get(
 			logger.addContext('transaction_id', transactionId);
 			const response = await listCommunesService.getListCommunes();
 			logger.info(JSON.stringify({ message: 'Lista de comunas obtenidos', data: response }));
-			res.json({ data: response });
+			res.json({ data: { communes: response } });
 		} catch (error) {
 			next(error);
 		}
