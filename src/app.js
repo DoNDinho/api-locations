@@ -33,4 +33,32 @@ app.use(async (err, req, res, next) => {
 // Iniciando servidor
 app.listen(port, () => {
 	logger.info('Servidor en puerto', port);
+
+	// TODO Borrar esto, ES SOLO PARA PRUEBAS
+
+	const cron = require('node-cron');
+	cron.schedule('0 4  * * *', async () => {
+		const oracledb = require('oracledb');
+		try {
+			const connection = await oracledb.getConnection({
+				user: 'ADMIN',
+				password: process.env.ORACLE_DB_PASSWORD,
+				connectString: process.env.ORACLE_DB_HOST
+			});
+
+			const logDescription = `Fecha y hora de inserción log ${new Date()}`;
+			await connection.execute(
+				` BEGIN
+					INSERT INTO TEST_LOG(FECHA, DESCRIPCION) VALUES(SYSDATE, '${logDescription}');
+					COMMIT;
+					END;
+					`,
+				{}
+			);
+
+			await connection.close();
+		} catch (error) {
+			console.log(error);
+		}
+	});
 });
